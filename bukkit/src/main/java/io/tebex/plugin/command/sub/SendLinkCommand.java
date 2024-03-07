@@ -36,6 +36,7 @@ public class SendLinkCommand extends SubCommand {
             return;
         }
         
+        // FOX - Make the operation non-blocking
         platform.getSDK().createCheckoutUrl(packageId, username).thenAccept(checkoutUrl -> {
             Bukkit.getScheduler().runTask(platform, () -> {
                 player.sendMessage("§b[Tebex] §7A checkout link has been created for you. Click here to complete payment: " + checkoutUrl.getUrl());
