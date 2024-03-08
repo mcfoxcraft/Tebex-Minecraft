@@ -2,10 +2,8 @@ package io.tebex.plugin.command.sub;
 
 import io.tebex.plugin.TebexPlugin;
 import io.tebex.plugin.command.SubCommand;
-import io.tebex.sdk.obj.CheckoutUrl;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-
-import java.util.concurrent.ExecutionException;
 
 public class CheckoutCommand extends SubCommand {
     public CheckoutCommand(TebexPlugin platform) {
@@ -25,14 +23,27 @@ public class CheckoutCommand extends SubCommand {
             sender.sendMessage("§b[Tebex] §7Invalid command usage. Use /tebex " + this.getName() + " " + getUsage());
             return;
         }
-
+        
+        // FOX - Handle non-number package ID
+        int packageId;
         try {
-            int packageId = Integer.parseInt(args[0]);
-            CheckoutUrl checkoutUrl = platform.getSDK().createCheckoutUrl(packageId, sender.getName()).get();
-            sender.sendMessage("§b[Tebex] §7Checkout started! Click here to complete payment: " + checkoutUrl.getUrl());
-        } catch (InterruptedException|ExecutionException e) {
-            sender.sendMessage("§b[Tebex] §7Failed to get checkout link for package, check package ID: " + e.getMessage());
+            packageId = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            sender.sendMessage("§b[Tebex] §7Package ID must be a number.");
+            return;
         }
+        
+        // FOX - Make the operation non-blocking
+        platform.getSDK().createCheckoutUrl(packageId, sender.getName()).thenAccept(checkoutUrl -> {
+            Bukkit.getScheduler().runTask(platform, () -> {
+                sender.sendMessage("§b[Tebex] §7Checkout started! Click here to complete payment: " + checkoutUrl.getUrl());
+            });
+        }).exceptionally(e -> {
+            Bukkit.getScheduler().runTask(platform, () -> {
+                sender.sendMessage("§b[Tebex] §7Failed to get checkout link for package, check package ID: " + e.getMessage());
+            });
+            return null;
+        });
     }
 
     @Override
