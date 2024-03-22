@@ -2,7 +2,6 @@ package io.tebex.plugin.command.sub;
 
 import io.tebex.plugin.TebexPlugin;
 import io.tebex.plugin.command.SubCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class BanCommand extends SubCommand {
@@ -37,17 +36,13 @@ public class BanCommand extends SubCommand {
         
         // FOX - Make the operation non-blocking
         platform.getSDK().createBan(playerName, ip, reason).thenAccept(success -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                if (success) {
-                    sender.sendMessage("§b[Tebex] §7Player banned successfully.");
-                } else {
-                    sender.sendMessage("§b[Tebex] §7Failed to ban player.");
-                }
-            });
+            if (success) {
+                sender.sendMessage("§b[Tebex] §7Player banned successfully.");
+            } else {
+                sender.sendMessage("§b[Tebex] §7Failed to ban player.");
+            }
         }).exceptionally(e -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                sender.sendMessage("§b[Tebex] §7Error while banning player: " + e.getMessage());
-            });
+            sender.sendMessage("§b[Tebex] §7Error while banning player: " + e.getMessage());
             return null;
         });
     }

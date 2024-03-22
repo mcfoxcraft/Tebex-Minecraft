@@ -2,7 +2,6 @@ package io.tebex.plugin.command.sub;
 
 import io.tebex.plugin.TebexPlugin;
 import io.tebex.plugin.command.SubCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class LookupCommand extends SubCommand {
@@ -28,21 +27,17 @@ public class LookupCommand extends SubCommand {
 
         // FOX - Make the operation non-blocking
         platform.getSDK().getPlayerLookupInfo(username).thenAccept(lookupInfo -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                if (lookupInfo != null) {
-                    sender.sendMessage("§b[Tebex] §7Username: " + lookupInfo.getLookupPlayer().getUsername());
-                    sender.sendMessage("§b[Tebex] §7Id: " + lookupInfo.getLookupPlayer().getId());
-                    sender.sendMessage("§b[Tebex] §7Chargeback Rate: " + lookupInfo.chargebackRate);
-                    sender.sendMessage("§b[Tebex] §7Bans Total: " + lookupInfo.banCount);
-                    sender.sendMessage("§b[Tebex] §7Payments: " + lookupInfo.payments.size());
-                } else {
-                    sender.sendMessage("§b[Tebex] §7No information found for that player.");
-                }
-            });
+            if (lookupInfo != null) {
+                sender.sendMessage("§b[Tebex] §7Username: " + lookupInfo.getLookupPlayer().getUsername());
+                sender.sendMessage("§b[Tebex] §7Id: " + lookupInfo.getLookupPlayer().getId());
+                sender.sendMessage("§b[Tebex] §7Chargeback Rate: " + lookupInfo.chargebackRate);
+                sender.sendMessage("§b[Tebex] §7Bans Total: " + lookupInfo.banCount);
+                sender.sendMessage("§b[Tebex] §7Payments: " + lookupInfo.payments.size());
+            } else {
+                sender.sendMessage("§b[Tebex] §7No information found for that player.");
+            }
         }).exceptionally(e -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                sender.sendMessage("§b[Tebex] §7Failed to complete player lookup. " + e.getMessage());
-            });
+            sender.sendMessage("§b[Tebex] §7Failed to complete player lookup. " + e.getMessage());
             return null;
         });
     }

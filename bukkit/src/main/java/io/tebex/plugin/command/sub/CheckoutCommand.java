@@ -2,7 +2,6 @@ package io.tebex.plugin.command.sub;
 
 import io.tebex.plugin.TebexPlugin;
 import io.tebex.plugin.command.SubCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class CheckoutCommand extends SubCommand {
@@ -35,13 +34,9 @@ public class CheckoutCommand extends SubCommand {
         
         // FOX - Make the operation non-blocking
         platform.getSDK().createCheckoutUrl(packageId, sender.getName()).thenAccept(checkoutUrl -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                sender.sendMessage("§b[Tebex] §7Checkout started! Click here to complete payment: " + checkoutUrl.getUrl());
-            });
+            sender.sendMessage("§b[Tebex] §7Checkout started! Click here to complete payment: " + checkoutUrl.getUrl());
         }).exceptionally(e -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                sender.sendMessage("§b[Tebex] §7Failed to get checkout link for package, check package ID: " + e.getMessage());
-            });
+            sender.sendMessage("§b[Tebex] §7Failed to get checkout link for package, check package ID: " + e.getMessage());
             return null;
         });
     }

@@ -3,7 +3,6 @@ package io.tebex.plugin.command.sub;
 import io.tebex.plugin.TebexPlugin;
 import io.tebex.plugin.command.SubCommand;
 import io.tebex.sdk.obj.CommunityGoal;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class GoalsCommand extends SubCommand {
@@ -19,17 +18,13 @@ public class GoalsCommand extends SubCommand {
         sender.sendMessage("§b[Tebex] §7Community Goals: ");
         
         platform.getSDK().getCommunityGoals().thenAccept(goals -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                for (CommunityGoal goal: goals) {
-                    if (goal.getStatus() != CommunityGoal.Status.DISABLED) {
-                        sender.sendMessage(String.format("§b[Tebex] §7- %s (%.2f/%.2f) [%s]", goal.getName(), goal.getCurrent(), goal.getTarget(), goal.getStatus()));
-                    }
+            for (CommunityGoal goal: goals) {
+                if (goal.getStatus() != CommunityGoal.Status.DISABLED) {
+                    sender.sendMessage(String.format("§b[Tebex] §7- %s (%.2f/%.2f) [%s]", goal.getName(), goal.getCurrent(), goal.getTarget(), goal.getStatus()));
                 }
-            });
+            }
         }).exceptionally(e -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                sender.sendMessage("§b[Tebex] §7Unexpected response: " + e.getMessage());
-            });
+            sender.sendMessage("§b[Tebex] §7Unexpected response: " + e.getMessage());
             return null;
         });
     }

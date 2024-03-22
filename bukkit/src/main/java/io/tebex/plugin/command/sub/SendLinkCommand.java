@@ -2,7 +2,6 @@ package io.tebex.plugin.command.sub;
 
 import io.tebex.plugin.TebexPlugin;
 import io.tebex.plugin.command.SubCommand;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,13 +37,9 @@ public class SendLinkCommand extends SubCommand {
         
         // FOX - Make the operation non-blocking
         platform.getSDK().createCheckoutUrl(packageId, username).thenAccept(checkoutUrl -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                player.sendMessage("§b[Tebex] §7A checkout link has been created for you. Click here to complete payment: " + checkoutUrl.getUrl());
-            });
+            player.sendMessage("§b[Tebex] §7A checkout link has been created for you. Click here to complete payment: " + checkoutUrl.getUrl());
         }).exceptionally(e -> {
-            Bukkit.getScheduler().runTask(platform, () -> {
-                sender.sendMessage("§b[Tebex] §7Failed to get checkout link for package: " + e.getMessage());
-            });
+            sender.sendMessage("§b[Tebex] §7Failed to get checkout link for package: " + e.getMessage());
             return null;
         });
     }
